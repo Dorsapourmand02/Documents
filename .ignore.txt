@@ -1,7 +1,0 @@
-.DS_STORE
-.obsidian/**/*.json
-.obsidian/workspace.json
-!.obsidian/snippets/
-!.obsidian/snippets/**
-.obsidian/plugins
-.obsidian/themes/
