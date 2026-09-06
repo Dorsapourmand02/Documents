@@ -13,7 +13,7 @@ Steps :
 
 1. Install the vm upload the iso file
 
-In this step you should give memory 40G , CPU 2core and also put the installation mode in GUI instead of minimal.
+In this step you should give memory 4G , CPU 2core and also put the installation mode in GUI instead of minimal.
 
 Give root password , create a normal user and give it a password.
 
