@@ -87,5 +87,22 @@ when you are installing DBCA you use this it is also the spdile but in our under
 
 CREATE SPFILE FROM PFILE='path/to/your/pfile.ora'
 
+Initializing the parameter file :
+1- Basic 
+2- Advance
+
+set and tune the pfile so you can have the reasonable performance from the database .
+
+Basic parameter :
+Global database name => DB_NAME , DB_DOMAIN
+FAST_RECOVERY_AREA
+SGA_TARGET
+
+PARAMETERS :
+static : only change in PFILE require instance restart 
+dynamic : can be changed while the database is online can be altered at session and system level
 
 
+session lecel : affect only on a user 
+system level : affect entire database and all sessions 
+ 
