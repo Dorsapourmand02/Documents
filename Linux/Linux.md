@@ -59,3 +59,11 @@ It is where the packages are be.
 apt command : be use for upgrading installing 
 
 
+# Partitioning 
+
+why we do partitioning ?
+- separate different type of data
+- file system organization 
+- Security : eg --> Separate /var prevent log growth from filling the root file system.
+- Different storage requirement
+
