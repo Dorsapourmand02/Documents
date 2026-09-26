@@ -103,6 +103,66 @@ static : only change in PFILE require instance restart
 dynamic : can be changed while the database is online can be altered at session and system level
 
 
-session lecel : affect only on a user 
+session level : affect only on a user 
 system level : affect entire database and all sessions 
  
+
+
+Normal operation for database is :
+Instance start ---> db mount ---> OPEN
+
+
+opening database includes the following :
+open all datafiles
+open the online redo log file
+
+if any of the rdo log files or datafiles be missed you will get error while you are starting it up!
+
+
+
+
+
+# Data Dictionary
+
+Data dictionary are contain metadata which are contains the names and al attributes of all objects which are existing in the database.
+
+Database server use data dictionary to access and find all data and informations about users , objects , constraints , storage.
+
+It is available for all users by using the sql but the SYS user own it . 
+
+**YOU SHOULD NEVER MODIFY THE DATA DICTIONARY DIRECTLY BY USING SQL SCRIPTS.**
+
+
+
+# Oracle Network 
+
+Oracle network enables network from client to the server .
+Oracle Net contains Listener which is responsible for coordinating between the server and external app.
+common use of oracle net is allowing incoming DB connection .
+for reaching to the database listener file :
+
+```
+su - grid
+
+vi $ORACLE_HOME/network/admin/listener
+```
+
+
+Gateway for nonlocal users to oracle instance .
+
+if it was necessary only if it was necessary you can manually edit it.
+
+Oracle Net knows these following :
+
+Hostname , Protocol , port , service name 
+
+```
+
+connection ----> listener check :is the sevice name valid ? --> yes --> spawn a new process to deal with the connections.
+|
+|
+|_______listener no more deal with connection ----> check the authenticationns (usually the passwords) ----> valid?--->yes --->Session create
+
+
+```
+

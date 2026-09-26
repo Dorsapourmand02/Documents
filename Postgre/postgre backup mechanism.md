@@ -4,13 +4,43 @@ Postgre has 4 method to do backups :
 3-Continuous Archiving and PITR 
 4-Backup with enterprise tools
 
+# **1-Logical backup**
+Logical backups export database objects into SQL commands or a custom archive file.
+
+- **Single Database Backup (Custom Format - Recommended):**
+    
+    Bash
+    
+    ```
+    pg_dump -U username -F c -b -v -f mydb_backup.dump mydb
+    ```
+    
+- **Restore Single Database:**
+    
+    Bash
+    
+    ```
+    pg_restore -U username -d mydb_restored -v mydb_backup.dump
+    ```
+    
+- **Entire Cluster Backup (All Databases & Roles):**
+    
+    Bash
+    
+    ```
+    pg_dumpall -U username > full_cluster_backup.sql
+    ```
+    
+
+> **Trade-off:** High flexibility (can restore individual tables or migrate across OS/architecture), but slow for databases over ~100 GB.
+
 
 
 # **2-Physical base backup**
 
 Instead of doing backup  directly from disk it will backup from data directory .
 All tables , indexes and filesystems are being saved in the data directory .
-But you should also know that database is writing on the disk frequently so if some changes happen while you're doing this kind of backup it would be corrupted.
+But you should also know that database is writing on the disk frequently so if some changes happen while you're doing this, backup would be corrupted.
 
 In  this method we have two restrictions :
 
@@ -19,7 +49,7 @@ In  this method we have two restrictions :
 2- Online/hot backup with snapshots 
 
 
-**Offline/cold backup **
+**Offline/cold backup 
 
 1.1- Find the config files 
 
@@ -71,6 +101,7 @@ sudo systemctl stop postgresql
 ```
 
 3.2- Empty the pgdata(main data directory) 
+
 ```
 sudo mv /var/lib/postgresql/16/main /var/lib/postgresql/16/main_corrupted
 sudo mkdir -p /var/lib/postgresql/wal_archive
@@ -105,7 +136,8 @@ recovery_target_action = 'promote'
 systemctl start postgresql
 ```
 
-# 4-Backup with enterprise tools
+# **4-Backup with enterprise tools**
+
 we have 3 tools:
 1-pg BackRest
 2-Barman
@@ -114,6 +146,7 @@ we have 3 tools:
 
 **pg BackRest**
 
+pgBackRest is optimized for speed, reliability, and handling multi-terabyte databases.
 
 1.Installation
 
@@ -166,3 +199,32 @@ max_wal_senders = 3
 sudo systemctl restart postgresql
 ```
 
+5.Create and Check the Stanza
+
+Before taking backups, you must initialize the **stanza** (the configuration scope that ties pgBackRest to your specific PostgreSQL database cluster) and verify that WAL archiving is working.
+
+Bash
+
+```
+# 1. Initialize the stanza
+sudo -u postgres pgbackrest --stanza=main-stanza stanza-create
+
+# 2. Validate configuration and test archive_command connection
+sudo -u postgres pgbackrest --stanza=main-stanza check
+```
+
+> **Verification:** The `check` command will force PostgreSQL to switch a WAL segment and push it to `/var/lib/pgbackrest`. If it completes without errors, your WAL archiving pipeline is operational.
+
+# 6.Taking Backups
+
+pgBackRest supports three types of physical backups: **Full**, **Differential**, and **Incremental**.
+
+#### A. Full Backup
+
+Copies every file in the database cluster. Required as the baseline for all subsequent backups.
+
+Bash
+
+```
+sudo -u postgres pgbackrest --stanza=main-stanza --type=full backup
+```
