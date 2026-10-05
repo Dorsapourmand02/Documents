@@ -26,3 +26,42 @@ AVDF is a combination of Database auditing and Network monitoring.
 
 
 
+**Database Auditing**
+Creating or enabling database policies to track the actions taken on the database , objects and users.
+
+If auditing is enables it will produce a trail of these operations which are happening where , when and by who.
+
+Database auditing is not only for local auditing but also any database activity that does not only capture local activity.
+
+**Database Firewall**
+Monitoring and analyzing the SQL traffic to database.(Doesn't matter that comes from applications or user directly)
+Firewall recognize all attacks which coming thwarting SQL injection or any other kinds.
+
+Firewall policy require that trusted path access to corporate applications should enforced .This trust let applications connect to database from certain IP address or users.
+
+```
+
+Firewall policies -----> monitor
+                  -----> Alert 
+                  -----> Block 
+                  -----> Substitude SQL Standard 
+
+```
+
+This happen base on user session information such as IP address or database username.
+
+Database Firewall Train to understand normal or approved SQL and block every other things.
+
+**Oracle recommend to Database activity monitoring requiring both SQL Auditing and SQL traffic monitoring**
+
+
+Auditing typically captures ==detailed information after a certain event has occurred==, while monitoring SQL traffic helps you ==monitor the SQL statement before it reaches the database==, **making it possible to block suspicious statements**.
+
+
+# **AVDF Components**
+
+AVDF has 3 main components 
+1- Audit vault server 
+2- Audit vault agent
+3- Database Firewall
+
