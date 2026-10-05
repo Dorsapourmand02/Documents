@@ -255,3 +255,4 @@ why we do partitioning ?
 - Security : eg --> Separate /var prevent log growth from filling the root file system.
 - Different storage requirement
 
+ 

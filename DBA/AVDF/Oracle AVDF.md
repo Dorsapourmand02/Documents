@@ -65,3 +65,71 @@ AVDF has 3 main components
 2- Audit vault agent
 3- Database Firewall
 
+
+
+###### **Audit Vault Server**
+
+The Audit Vault Server is a mandatory component of AVDF. The Audit vault server is a complete App. It contains:
+
+```
+Hardened Oracle linux operating system 
+Oracle Database (NOT USUAL AND NORMAL ONE)
+AVDF application
+```
+
+###### **Hardened Oracle Linux operating system**
+In this part we should :
+delete all useless and extra services 
+Close all unnecessary IP addresses 
+More security 
+and access restricted 
+
+###### **Oracle Database**
+This is not a normal database because it keeps all audit vault logs. Also it use TDE for more security so if some one still the files they can not read the files (EVEN DBA.)
+
+
+###### **AVDF applications**
+
+It is application on the server so we can do all the following stuff with it :
+
+```
+1- See all reports 
+2- Define policy 
+3- See Alerts 
+4- Mangage all Targets 
+```
+
+This application contains :
+
+1- Web Console 
+2- AVCLI 
+
+
+**Web console**
+We open it with browser 
+
+**AVCLI**
+A Command line interface
+
+
+A general view of Audit vault server :
+
+
+```
+        Audit Vault Server
+        ┌────────────────────────────┐
+        │                            │
+        │ 1. Hardened Linux OS       │
+        │                            │
+        │ 2. Oracle Database         │
+        │    (Audit Repository)      │
+        │    - TDE Encryption        │
+        │    - Database Vault        │
+        │                            │
+        │ 3. AVDF Application        │
+        │    - Web Console           │
+        │    - AVCLI                 │
+        │                            │
+        └────────────────────────────┘
+```
+
