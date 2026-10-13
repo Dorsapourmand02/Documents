@@ -63,3 +63,34 @@ tmpfs                771M   48K  771M   1% /run/user/1000
 tmpfs                771M     0  771M   0% /run/user/54321
 
 ```
+
+
+
+# **Requirements**
+
+
+
+| REQ  | Database Firewall | Audit vault |
+| ---- | ----------------- | ----------- |
+| Disk | min 220Gb         | min 370 Gb  |
+| RAM  | 8Gb               | 8Gb         |
+| NIC  |                   |             |
+
+
+# **Installation Steps**
+
+#### **Step 2 : AVS Installation**
+
+2.1 - prepare the AVS machine 
+
+
+| Setting            | Requirements                           |
+| ------------------ | -------------------------------------- |
+| VM NAME            | AVDF-AVS-20.18                         |
+| Installation Media | `V1057411-01.iso` — Audit Vault Server |
+| Virtual disk       | At least 370                           |
+| Network adapter    | At least 1 NIC                         |
+| RAM                | At least 8 GB for lab more for PRD env |
+| Instaaltion        | Boot from the AVS iso                  |
+The appliance installer manages its own operating system, so don't install Oracle Linux separately inside this VM.
+
