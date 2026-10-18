@@ -166,3 +166,43 @@ connection ----> listener check :is the sevice name valid ? --> yes --> spawn a 
 
 ```
 
+# **Administering user security**
+
+What is database user?
+ach user is an identity to a database it can Authenticate , Use objects by owner and get license.
+
+```
+APP_USER --> CONNECTING TO APP
+REPORT_USER --> GET REPORTS ONLY 
+DBA_USER --> MANAGING USER 
+```
+
+
+Each user has these following things :
+1- Authentication
+2-Privileges
+3-Storage Quota
+
+
+
+#### Predefined Administrative Accounts
+
+These are managing users in oracle :
+
+1- SYS 
+Owner of data dictionary and have for using this account you should use `AS SYSDBA` .
+
+2-SYSTEM 
+Another powerful managing 
+
+3-SYSBACKUP، SYSDG and SYSKM
+each one of these users do the specific job in database 
+
+
+|Privilege|Main Purpose|
+|---|---|
+|`SYSDBA`|Comprehensive database administration operations, including startup and shutdown|
+|`SYSOPER`|Basic database administration operations with more limited access than `SYSDBA`|
+|`SYSBACKUP`|Backup and recovery operations|
+|`SYSDG`|Data Guard operations|
+|`SYSKM`|Managing Transparent Data Encryption (TDE) key operations|
