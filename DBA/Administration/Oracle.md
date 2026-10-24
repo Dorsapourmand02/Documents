@@ -1,4 +1,4 @@
-`# **ORACLE ARCHITECTURE**
+# **ORACLE ARCHITECTURE**
 
 ORACLE has two main part 
 1- Instance + background processes --> Exist in RAM
@@ -206,3 +206,77 @@ each one of these users do the specific job in database
 |`SYSBACKUP`|Backup and recovery operations|
 |`SYSDG`|Data Guard operations|
 |`SYSKM`|Managing Transparent Data Encryption (TDE) key operations|
+
+
+# **Tablespace**
+
+
+create a tablespace 
+
+```
+create tablespace test_tblspace
+DATAFILE '/u01/app/oracle/oradata/ORCL/my_tablespace01.dbf'
+SIZE 100M
+AUTOEXTEND ON
+NEXT 10M
+MAXSIZE 2G;
+```
+
+# **Managing Space**
+
+Space is automatically manage in oracle Database server.It generate Alert about potential problem and recommends possible solutions.
+
+
+
+#### **OMF**
+It let oracle to name and save some files where oracle wants instead of specifying the location and name in the query.
+
+without OMF :
+
+```
+CREATE TABLESPACE app_ts
+DATAFILE '/u01/app/oracle/oradata/ORCL/app_ts01.dbf'
+SIZE 100M;
+```
+
+with OMF :
+
+you only specify the size 
+
+```
+CREATE TABLESPACE app_ts
+DATAFILE SIZE 100M;
+```
+
+
+checking OMF in your database :
+
+```
+SELECT name, value
+FROM v$parameter
+WHERE name IN (
+    'db_create_file_dest',
+    'db_create_online_log_dest_1',
+    'db_recovery_file_dest'
+);
+```
+
+If you add a datafile to a tablespace OMF save the name and directioon by itself you only define the size of the datafile.
+
+
+**Row chaining and Migration**
+
+when a row insert if it is too large for a data block data chaining happen. Oracle can store it across multiple blocks. This is row chaining.
+
+when an update happen or by any chance the row gets larger oracle migrate the row to new block so it can fit in it.
+
+
+#### **Managing segment free spaces**
+
+There is 2 ways for managing the free spaces:
+
+1- MSSM
+Oracle use free list to find what block is free. Free list is a list of block free spaces. It's manage manually  
+**use in older databases**
+
+2-
