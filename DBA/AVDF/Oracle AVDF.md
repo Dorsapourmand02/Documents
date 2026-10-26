@@ -82,7 +82,39 @@ Depending on the deployment mode and configured policies, it can:
 - **SQL Statement** --> Allows administrators to define policies based on approved SQL statements and application behavior (who is running what).
     
 - **Database Object** --> Helps monitor and protect sensitive data and application database objects according to configured policies.
-    
+
+
+
+**Monitoring Mode**
+
+In monitoring deployments, the firewall analyzes visible SQL traffic and generates events or alerts according to its configuration. It does not necessarily block the traffic.
+
+**Proxy Mode**
+
+In supported Proxy-mode deployments, traffic passes through the Database Firewall. This allows it to enforce configured policies, including blocking or substituting SQL statements when supported.
+
+A simplified workflow:
+
+```text
+Client / Application
+        |
+        v
+Database Firewall
+        |
+        |-----> Analyze SQL Traffic
+        |
+        |-----> Apply Security Policies
+        |
+        |-----> Generate Alerts
+        |
+        |-----> Block / Substitute
+        |       (when supported)
+        |
+        v
+Target Database
+```
+
+The exact architecture depends on whether the deployment uses monitoring or an enforcement configuration.
 
 **Database Auditing**
 
@@ -193,6 +225,48 @@ A general view of Audit vault server :
         └────────────────────────────┘
 ```
 
+Database Vault and other security mechanisms should only be listed as components of the repository when they are confirmed to be included and configured in the specific AVDF release. Do not assume that every security feature is independently configurable by the AVDF administrator.
+
+###### Audit Vault Agent
+
+The Audit Vault Agent is installed on supported target systems when required by the selected collection method.
+
+Its main responsibilities are:
+
+- Collect audit data from supported target systems.
+    
+- Transfer collected audit records securely to the Audit Vault Server.
+    
+- Support the configured audit collection mechanism for each target.
+    
+- Report collection status and related information to AVDF.
+    
+
+The agent is not necessarily required for every type of target or every collection method. Some targets use other supported collection mechanisms.
+
+For example, when collecting database audit records, the agent works with the configured database audit source and collection settings.
+
+A simplified workflow:
+
+```text
+Target Database
+      |
+      |  Audit Records
+      v
+Audit Vault Agent
+      |
+      |  Secure Transfer
+      v
+Audit Vault Server
+      |
+      v
+Central Audit Repository
+      |
+      v
+Reports, Alerts, and Investigation
+```
+
+The agent collects and transfers audit information. It does not replace the native database auditing mechanism that generates the audit records.
 
 
 
