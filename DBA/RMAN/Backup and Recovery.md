@@ -118,14 +118,6 @@ the result :
 
 
    
-##### create a backup user
-
-```
-create user BACKUPOPER IDENTIFIED BY oracle ;
-grant SYSBACKUP TO BACKUPOPER;
-GRANT CREATE SESSION TO BACKUPOPER;
-```
-
 
 #### Backup Terminology 
 
@@ -157,28 +149,27 @@ RMAN is abe to take backup from following types of files :
 
 
 
+
 #### Backup commands
 
 ```
-BACKUP [AS BACKUPSET] DATABASE ---archive not included
-BACKUP DATABASE PLUS ARCHIVELOG
+BACKUP DATABASE ---archive not included
+BACKUP DATABASE PLUS ARCHIVELOG ---archive included (hot backup)
 ```
 
-Hot backup can not be running if the ARCHIVEMODE is off.
+*Hot backup can not be running if the ARCHIVEMODE is off.
 
 **Backup set : is a concept that include one or two backup pieces.**
 
 
-
 #### Inconsistent and consistent backups
+
 * Inconsistence backup (Online , Hot)
-  
   ```
   BAKCUP DATABASE PLUS ARCHIVELOG
   ```
   
 * Consistent backup (offline , cold )
-
   ```
   SHUTDOWN IMMEDIATE
   START MOUNT
@@ -262,10 +253,10 @@ ORA-15041: diskgroup "DATA" space exhausted
 
 ```
 
-it means you are out of space first you should delete your archive log or resize the FRA
+it means you are out of space first you should delete your archive log .
 
 
-delete archive log:
+##### delete archive log:
 
 ```
 rman target 
@@ -273,108 +264,42 @@ rman target
 delete archivelog all;
 ```
 
-checking FRA size :
 
-```
-
-SELECT
-    NAME,
-    ROUND(SPACE_LIMIT / 1024 / 1024 / 1024, 2) AS TOTAL_GB,
-    ROUND(SPACE_USED / 1024 / 1024 / 1024, 2) AS USED_GB,
-    ROUND(SPACE_RECLAIMABLE / 1024 / 1024 / 1024, 2) AS RECLAIMABLE_GB,
-    NUMBER_OF_FILES
-FROM V$RECOVERY_FILE_DEST;
-```
-## save backups in special directory with special name 
+##### save backups in special directory with special name 
 
 1. with grid user :
-   
-   ```
-   asmcmd 
+
+```
+asmcmd 
    
    > cd DATA
    > cd ORCL
    > mkdir BACKUPS
    > 
-   ```
+```
+
 2. With oracle user enter to RMAN 
-   
-   ```
-   RMAN > CONFIGURE CHANNEL DVICE TYPR DISK FORMAT '+DATA/ORCL/BACKUPS/ORCL_FULL_%u.bkp';
-   ``` 
-
-
-##### Checking the used spaces 
-
 ```
-select FILE_TYPE , PERCENT_SPACE_USED FROM V$RECOVERY_AREA_USAGE WHERE PERCENT_SPACE_USED<>0 ORDER BY PERCENT_SPACE_USED DESC;
-```
-
-result 
-
-```
-|FILE_TYPE   |PERCENT_SPACE_USED|
-|:--         |:--               |
-|REDO LOG    |        2.94      |
-|ARCHIVED LOG|        0.84      |
-|BACKUP PIECE|        0.09      |
-|CONTROL FILE|        0.09      |
+RMAN > CONFIGURE CHANNEL DVICE TYPR DISK FORMAT '+DATA/ORCL/BACKUPS/ORCL_FULL_%u.bkp';
 ```
 
 
-# Delete backup
+##### Monitoring
 
-#### No.1
-
-```
-RMAN> delete backupset of database;
-```
-
-
-
-
-# Monitoring
-
-for monitor backup size and free spaces :
-
+##### check all space:
 
 ```
-
-WITH BACKUP_INFO AS (
-    SELECT NVL(SUM(BYTES), 0) AS BACKUP_BYTES
-    FROM V$BACKUP_PIECE
-    WHERE STATUS = 'A'
-),
-FRA_INFO AS (
-    SELECT
-        SPACE_LIMIT,
-        SPACE_USED
-    FROM V$RECOVERY_FILE_DEST
-)
 SELECT
-    ROUND(B.BACKUP_BYTES / POWER(1024, 3), 2) AS BACKUP_SIZE_GB,
-
-    ROUND(F.SPACE_LIMIT / POWER(1024, 3), 2) AS FRA_TOTAL_GB,
-
-    ROUND(
-        (F.SPACE_LIMIT - F.SPACE_USED) / POWER(1024, 3), 2
-    ) AS FRA_REMAINING_GB
-
-FROM BACKUP_INFO B
-CROSS JOIN FRA_INFO F;
-
-```
-
-result:
-
-```
-|BACKUP_SIZE_GB|FRA_TOTAL_GB|FRA_REMAINING_GB|
-|:--           |:--         |:--             |
-|8.45          |20          |19.1            |
+    NAME AS DISKGROUP,
+    ROUND(TOTAL_MB / 1024, 2) AS TOTAL_GB,
+    ROUND((TOTAL_MB - FREE_MB) / 1024, 2) AS USED_GB,
+    ROUND(FREE_MB / 1024, 2) AS FREE_GB,
+    ROUND((TOTAL_MB - FREE_MB) / TOTAL_MB * 100, 2) AS USED_PERCENT
+FROM V$ASM_DISKGROUP;
 ```
 
 
-For monitoring all disk you have:
+##### check each file size:
 
 ```
 SELECT
@@ -386,40 +311,131 @@ GROUP BY TYPE
 ORDER BY SIZE_GB DESC;
 ```
 
-result:
 
-```
-|DISKGROUP|TOTAL_GB|USED_GB|FREE_GB|USED_PERCENT|
-|:--      |:--     |:--    |:--    |:--         |
-|DATA     |20      |15.95  |4.05   |79.76       |
+
+##### checking the tablespaces size :
 ```
 
+SELECT
+    TABLESPACE_NAME,
+    FILE_NAME,
+    ROUND(BYTES/1024/1024, 2) AS SIZE_MB,
+    AUTOEXTENSIBLE,
+    ROUND(MAXBYTES/1024/1024, 2) AS MAX_SIZE_MB
+FROM DBA_DATA_FILES
+ORDER BY TABLESPACE_NAME, FILE_NAME;
 
-to see what file use how much space:
+```
+
 
 ```
 SELECT
-    TYPE,
-    COUNT(*) AS FILE_COUNT,
-    ROUND(SUM(BYTES) / 1024 / 1024 / 1024, 2) AS SIZE_GB
-FROM V$ASM_FILE
-GROUP BY TYPE
-ORDER BY SIZE_GB DESC;
+    TABLESPACE_NAME,
+    ROUND(SUM(BYTES) / 1024 / 1024 / 1024, 2) AS FREE_GB
+FROM DBA_FREE_SPACE
+GROUP BY TABLESPACE_NAME
+ORDER BY FREE_GB;
+```
+
+##### check your backup status :
+
+```
+SELECT
+    SESSION_KEY,
+    INPUT_TYPE,
+    STATUS,
+    START_TIME,
+    END_TIME,
+    OUTPUT_BYTES_DISPLAY
+FROM V$RMAN_BACKUP_JOB_DETAILS
+ORDER BY START_TIME DESC
+FETCH FIRST 5 ROWS ONLY;
+
 
 ```
 
 
-result:
+
+
+#### Backup from tablespace
 
 ```
-|TYPE         |FILE_COUNT|SIZE_GB|
-|:--          |:--       |:--    |
-|BACKUPSET    |30        |16.79  |
-|DATAFILE     |12        |5.28   |
-|ONLINELOG    |6         |1.17   |
-|TEMPFILE     |3         |0.62   |
-|ARCHIVELOG   |13        |0.22   |
-|AUTOBACKUP   |3         |0.05   |
-|CONTROLFILE  |2         |0.04   |
-|PARAMETERFILE|1         |0      |
+backup tablespace USERS FORMAT '+DATA/ORCL/BACKUPS/tblspace_%U.bkp';
 ```
+
+
+##### Check controlfile autobackup 
+
+```
+show controlfile autobackup
+```
+if it was off :
+```
+RMAN> configure controlfile autobackup on;
+```
+
+##### List of backups from Controlfiles
+
+```
+LIST BACKUP OF CONTROLFILE;
+```
+
+
+
+##### Incremental backup 
+It is faster than full backup.
+It is easier to restore from it.
+
+we have 2 level incremental backup :
+
+1. LEVEL 0
+2. LEVEL 1
+
+Level 0 :
+It took backup from whole database and blocks and datafiles.
+
+
+```
+BACKUP INCREMENTAL LEVEL 0 DATABASE;
+```
+
+
+LEVEL 1 :
+It will take backup from the last changes since the last level 0 backup.
+
+
+```
+BACKUP INCREMENTAL LEVEL 1 DATABASE;
+```
+
+
+
+##### What is BCT ?
+BCT  is the short of Block Changing Tracking.
+
+Imagine that your database has only 100 GB storage , and now 2GB of its block changes .RMAN should scan whole database to find out where are the changes.
+Now BCT help us in here for making it fast and better . If you enable BCT every changes would be written on the specific file so RMAN would use this file to fine the changed blocks. 
+
+check the status:
+
+```
+SELECT STATUS, FILENAME, BYTES
+FROM V$BLOCK_CHANGE_TRACKING;
+
+```
+
+RESULT :
+
+```
+|STATUS|FILENAME|BYTES|
+|:--|:--|:--|
+|DISABLED|||
+```
+
+
+Now to enable it:
+
+```
+ALTER DATABASE ENABLE BLOCK CHANGE TRACKING;
+```
+
