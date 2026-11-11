@@ -1,5 +1,4 @@
 
-
 ### Possible Failure 
 
 1. User Process failure 
@@ -439,3 +438,13 @@ Now to enable it:
 ALTER DATABASE ENABLE BLOCK CHANGE TRACKING;
 ```
 
+
+
+| مشخصات                  | TEST1        | TEST2        | DBLVL1             |
+| ----------------------- | ------------ | ------------ | ------------------ |
+| نوع بکاپ                | Level 0      | Level 1      | Level 1 Cumulative |
+| تعداد Backup Set        | 5            | 4            | 4                  |
+| تعداد Datafile بکاپ‌شده | 13           | 10           | 10                 |
+| حجم کل                  | حدود 3.91 GB | حدود 12.1 MB | حدود 12.4 MB       |
+| مجموع Elapsed Time      | 62 ثانیه     | 10 ثانیه     | 9 ثانیه            |
+| وضعیت                   | AVAILABLE    | AVAILABLE    | AVAILABLE          |
