@@ -440,11 +440,54 @@ ALTER DATABASE ENABLE BLOCK CHANGE TRACKING;
 
 
 
-| مشخصات                  | TEST1        | TEST2        | DBLVL1             |
-| ----------------------- | ------------ | ------------ | ------------------ |
-| نوع بکاپ                | Level 0      | Level 1      | Level 1 Cumulative |
-| تعداد Backup Set        | 5            | 4            | 4                  |
-| تعداد Datafile بکاپ‌شده | 13           | 10           | 10                 |
-| حجم کل                  | حدود 3.91 GB | حدود 12.1 MB | حدود 12.4 MB       |
-| مجموع Elapsed Time      | 62 ثانیه     | 10 ثانیه     | 9 ثانیه            |
-| وضعیت                   | AVAILABLE    | AVAILABLE    | AVAILABLE          |
+|         مشخصات          |    TEST1     |    TEST2     |       DBLVL1       |
+| :---------------------: | :----------: | :----------: | :----------------: |
+|        نوع بکاپ         |   Level 0    |   Level 1    | Level 1 Cumulative |
+|    تعداد Backup Set     |      5       |      4       |         4          |
+| تعداد Datafile بکاپ‌شده |      13      |      10      |         10         |
+|         حجم کل          | حدود 3.91 GB | حدود 12.1 MB |    حدود 12.4 MB    |
+|   مجموع Elapsed Time    |   62 ثانیه   |   10 ثانیه   |      9 ثانیه       |
+|          وضعیت          |  AVAILABLE   |  AVAILABLE   |     AVAILABLE      |
+
+
+
+#### Monitorig
+
+**Listing backups**
+
+
+Show all backups with details:
+
+```
+LIST BACKUP;
+```
+
+Show all backups summarized:
+
+```
+LIST BACKUP SUMMARY; 
+```
+
+Show Expired backup:
+
+```
+LIST EXPIRED BACKUP;
+```
+
+Each backup has a unique id which we call it BS KEY(Backup set key) we can use them  to search for s specific backup.
+
+```
+LIST BACKUPSET BSKEY;
+```
+
+Also you can search about backup by their Tags :
+
+```
+LIST BACKUP SET TAG '...';
+```
+
+ If you need to see what files need backup :
+```
+REPORT NEED BACKUP;
+```
+
